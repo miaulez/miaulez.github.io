@@ -14,17 +14,6 @@
     {% include head/custom.html %}
   </head>
 
-<style>
-.layout--home {
-    overflow-y: scroll;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-}
-.layout--home::-webkit-scrollbar { /* WebKit */
-    width: 0;
-    height: 0;
-}
-</style>
 
 
   <body class="layout--{{ page.layout | default: layout.layout }}{% if page.classes or layout.classes %}{{ page.classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}">
@@ -46,7 +35,7 @@
       <footer>
         {% include footer/custom.html %}
         {% include_cached footer.html %}
-      </footer>
+     </footer>
     </div>
 
 

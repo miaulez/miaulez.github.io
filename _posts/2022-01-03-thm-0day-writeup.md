@@ -2,7 +2,7 @@
 layout: single
 title: 0day - Try Hack Me
 excerpt: "0day invloves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit."
-date: 2021-05-22
+date: 2022-01-03
 classes: wide
 header:
   teaser: /assets/images/thm/0day/thumbnail.png
@@ -12,6 +12,7 @@ categories:
   - tryhackme
   - infosec
 tags:  
+  - overlayfs
   - shellshock
   - kernel exploit
   - tryhackme

@@ -2,7 +2,7 @@
 layout: single
 title: Vulnversity - Try Hack Me
 excerpt: "Vulnversity is a beginner friendly box from TryHackMe. The initial foothold involves exploiting a poorly secured upload functionality. Privilege Escalation is done via systemctl which has suid bit set"
-date: 2021-05-22
+date: 2022-01-03
 classes: wide
 header:
   teaser: /assets/images/thm/vulnversity/thumbnail.png

@@ -1,0 +1,607 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.15.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>CMesS - Try Hack Me - miaulez.rocks</title>
+<meta name="description" content="Can you root this Gila CMS box?">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="miaulez.rocks">
+<meta property="og:title" content="CMesS - Try Hack Me">
+<meta property="og:url" content="http://localhost:4000/thm-cmess-writeup/">
+
+
+  <meta property="og:description" content="Can you root this Gila CMS box?">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/thm/cmess/thumbnail.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-01-04T00:00:00-05:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/thm-cmess-writeup/">
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Miaulez",
+      "url": "http://localhost:4000",
+      "sameAs": null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="miaulez.rocks Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE ]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+
+
+  <body class="layout--single wide">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/masthead.gif" alt=""></a>
+                
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/" >Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/" >Posts</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/" >Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/" >Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/" >About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+    
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        <li class="current">CMesS - Try Hack Me</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/images/avatar.jpg" alt="Miaulez" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Miaulez</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Penetration Tester<br>eCPPT | eWPT | eJPT
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Romania</span>
+        </li>
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="mailto:root@miaulez.rocks">
+            <meta itemprop="email" content="root@miaulez.rocks" />
+            <i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i> Email
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/miaulez_sec" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/lacatus-lucian-7a6a17221" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://instagram.com/miaulez_sec" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-instagram" aria-hidden="true"></i> Instagram
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="CMesS - Try Hack Me">
+    <meta itemprop="description" content="Can you root this Gila CMS box?">
+    <meta itemprop="datePublished" content="January 04, 2022">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">CMesS - Try Hack Me
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p class="page__meta">
+          
+            <i class="fa fa-fw fa-calendar" aria-hidden="true"></i> <time datetime="2022-01-04T00:00:00-05:00">January 04, 2022 </time>&emsp;
+          
+          
+        </p>
+        <p><img src="/assets/images/thm/cmess/1.png" alt="" /></p>
+
+<p>Heyo, today we’re doing Cmess from tryhackme, a medium-rated box that involved finding a local file inclusion, looking at a configuration file to find a subdomain, getting a password for a user that we can log into an admin panel with. For remote code execution we’re abusing an upload form and we modify a .htaccess file. On the box there’s a backup password hidden in /opt that gets us a low-priv user shell on the box. For privilege escalation we’re abusing a cronjob tar wildcard within a folder where we have write permission.</p>
+
+<h2 id="nmap">Nmap</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Nmap 7.91 scan initiated Wed Sep 22 10:46:04 2021 as: nmap -sC -sV -oN nmap/cmess -p- 10.10.211.176</span>
+Nmap scan report <span class="k">for </span>10.10.211.176
+Host is up <span class="o">(</span>0.027s latency<span class="o">)</span><span class="nb">.</span>
+Not shown: 65533 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 <span class="o">(</span>Ubuntu Linux<span class="p">;</span> protocol 2.0<span class="o">)</span>
+| ssh-hostkey: 
+|   2048 d9:b6:52:d3:93:9a:38:50:b4:23:3b:fd:21:0c:05:1f <span class="o">(</span>RSA<span class="o">)</span>
+|   256 21:c3:6e:31:8b:85:22:8a:6d:72:86:8f:ae:64:66:2b <span class="o">(</span>ECDSA<span class="o">)</span>
+|_  256 5b:b9:75:78:05:d7:ec:43:30:96:17:ff:c6:a8:6c:ed <span class="o">(</span>ED25519<span class="o">)</span>
+80/tcp open  http    Apache httpd 2.4.18 <span class="o">((</span>Ubuntu<span class="o">))</span>
+|_http-generator: Gila CMS
+| http-robots.txt: 3 disallowed entries 
+|_/src/ /themes/ /lib/
+|_http-server-header: Apache/2.4.18 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: Site doesn<span class="s1">'t have a title (text/html; charset=UTF-8).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Sep 22 10:46:31 2021 -- 1 IP address (1 host up) scanned in 27.76 seconds
+</span></code></pre></div></div>
+
+<p>Before going to the webserver, there’s one thing we’re required to do.</p>
+
+<p><img src="/assets/images/thm/cmess/2.png" alt="" /></p>
+
+<p><img src="/assets/images/thm/cmess/3.png" alt="" /></p>
+<h2 id="webserver">WebServer</h2>
+
+<p><img src="/assets/images/thm/cmess/4.png" alt="" /></p>
+
+<p>Nothing appears out of the order at the first sight, but we do have a copyright that’s from 2017, as well as the name of the possible CMS that the website is running on “Gila CMS”. First things first, searchsploit it.</p>
+
+<p><img src="/assets/images/thm/cmess/5.png" alt="" /></p>
+
+<p>4 results. Because the copyright on the website says 2017, I’ll go with the last one “Gila CMS &lt; 1.11.1 - Local File Inclusion”.</p>
+
+<p><img src="/assets/images/thm/cmess/6.png" alt="" /></p>
+
+<p>Authenticated, since we haven’t got any type of access we’re not going to dig into it. I went googling in hope that I’ll find something, and I did.</p>
+
+<p>Post: https://infosecdb.wordpress.com/2020/01/05/gilacms-1-11-8-cm-deletet-lfi-local-file-inclusion-and-rce/</p>
+
+<p><img src="/assets/images/thm/cmess/7.png" alt="" /></p>
+
+<p>It says “Authentication: Required” , but let’s go for it anyway.</p>
+
+<p><img src="/assets/images/thm/cmess/8.png" alt="" /></p>
+
+<p>Hmm, let’s try the base root.</p>
+
+<p><img src="/assets/images/thm/cmess/9.png" alt="" /></p>
+
+<p>Hey look at that, local file inclusion. Now what can we do with it? I’ve tried php filters, and quite some ways to obtain remote code execution off of it. Nothing, but a thing I always check when i see a local file inclusion on a webserver that runs apache is “/etc/apache2/sites-available/000-default.conf”, if there’s any virutal host in place, this file will give us quite valuable information, let’s try that.</p>
+
+<p><img src="/assets/images/thm/cmess/10.png" alt="" /></p>
+
+<p>Looks like we’ve got something, dev.cmess.thm. Let’s add that to our hosts file and see what’s there.</p>
+
+<p><img src="/assets/images/thm/cmess/11.png" alt="" /></p>
+
+<p><img src="/assets/images/thm/cmess/12.png" alt="" /></p>
+
+<p>I’ve tried logging into the box via ssh with it but it didn’t work. So let’s try it on the admin panel.</p>
+
+<p><img src="/assets/images/thm/cmess/13.png" alt="" /></p>
+
+<p><img src="/assets/images/thm/cmess/14.png" alt="" /></p>
+
+<p>And we get in. We can also see the version of Gila that’s running on. Now our main goal here is to obtain rce. After 2 minutes of googling I’ve stumbled across a post on github.</p>
+
+<p>Post: https://github.com/jkana/Gila-CMS-1.16.0-shell-upload</p>
+
+<p><img src="/assets/images/thm/cmess/15.png" alt="" /></p>
+
+<p>Instead of going 1:1 with that post, I’ll do it my way.</p>
+
+<p>First, one directory up.</p>
+
+<p><img src="/assets/images/thm/cmess/16.png" alt="" /></p>
+
+<p>Then we create a file called whateveryouwant.php (you can literally call it however you want, just make sure it has .php at the end)</p>
+
+<p>In it we put a reverse shell.</p>
+
+<p><img src="/assets/images/thm/cmess/17.png" alt="" /></p>
+
+<p>I’ve already updated the ip and port. After the file has been created, we’re going to overwrite the .htaccess by making a new .htaccess</p>
+
+<p><img src="/assets/images/thm/cmess/18.png" alt="" /></p>
+
+<p><img src="/assets/images/thm/cmess/19.png" alt="" /></p>
+
+<p>Now, the second after we press “Ok” it’ll say Not Found.</p>
+
+<p><img src="/assets/images/thm/cmess/20.png" alt="" /></p>
+
+<p>Now, just go to the base root and type your shell’s name. Let’s start a listener first.</p>
+
+<p><img src="/assets/images/thm/cmess/21.png" alt="" /></p>
+
+<p>Now let’s activate the shell by going to the base root + filename.php</p>
+
+<p><img src="/assets/images/thm/cmess/22.png" alt="" /></p>
+
+<p>I got the shell and I’ve stabilized it. After just 20 seconds of poking around I’ve found a hidden file called .password.bak in /opt directory</p>
+
+<p><img src="/assets/images/thm/cmess/23.png" alt="" /></p>
+
+<h2 id="user">User</h2>
+
+<p>Let’s try to log in via ssh.</p>
+
+<p><img src="/assets/images/thm/cmess/24.png" alt="" /></p>
+
+<p>After checking some basic things I checked /etc/crontab</p>
+
+<p><img src="/assets/images/thm/cmess/25.png" alt="" /></p>
+
+<p>For me, this looks like an easy privesc, since we have write permission in our own home folder, we can abuse the wildcard (*) to get a reverse shell as root on the box, let’s see that in action. :)</p>
+
+<p><img src="/assets/images/thm/cmess/26.png" alt="" /></p>
+
+<p>Now we’re waiting for the connection to be made :D</p>
+
+<h2 id="rooted">Rooted</h2>
+
+<p><img src="/assets/images/thm/cmess/27.png" alt="" /></p>
+
+<p>That was it, a fun medium-rated box from tryhackme, hope you enjoyed, thanks for reading.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#cve-2020-5513" class="page__taxonomy-item" rel="tag">CVE-2020-5513</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#enumeration" class="page__taxonomy-item" rel="tag">enumeration</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#gila-cms" class="page__taxonomy-item" rel="tag">gila cms</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#lfi" class="page__taxonomy-item" rel="tag">lfi</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#pentesting" class="page__taxonomy-item" rel="tag">pentesting</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#security" class="page__taxonomy-item" rel="tag">security</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#tar" class="page__taxonomy-item" rel="tag">tar</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#infosec" class="page__taxonomy-item" rel="tag">infosec</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#tryhackme" class="page__taxonomy-item" rel="tag">tryhackme</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-01-04T00:00:00-05:00">January 04, 2022</time></p>
+        
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/thm-vulnversity-writeup/" class="pagination--pager" title="Vulnversity - Try Hack Me
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+</div>
+
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Miaulez</div>
+
+     </footer>
+    </div>
+
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script data-search-pseudo-elements defer src="https://use.fontawesome.com/releases/v5.7.1/js/all.js" integrity="sha384-eVEQC9zshBn0rFj4+TU78eNA19HMNigMviK/PU/FFjLXqa/GKPgX58rvt5Z8PLs7" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+  </body>
+</html>

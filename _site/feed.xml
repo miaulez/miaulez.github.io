@@ -1,4 +1,139 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-03T11:15:37-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">miaulez.rocks</title><subtitle>Ethical Hacking, Penetration Testing, Security, CTFs and more.</subtitle><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><entry><title type="html">0day - Try Hack Me</title><link href="http://localhost:4000/thm-0day-writeup/" rel="alternate" type="text/html" title="0day - Try Hack Me" /><published>2021-05-22T00:00:00-04:00</published><updated>2021-05-22T00:00:00-04:00</updated><id>http://localhost:4000/thm-0day-writeup</id><content type="html" xml:base="http://localhost:4000/thm-0day-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-05T09:54:41-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">miaulez.rocks</title><subtitle>Ethical Hacking, Penetration Testing, Security, CTFs and more.</subtitle><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><entry><title type="html">CMesS - Try Hack Me</title><link href="http://localhost:4000/thm-cmess-writeup/" rel="alternate" type="text/html" title="CMesS - Try Hack Me" /><published>2022-01-04T00:00:00-05:00</published><updated>2022-01-04T00:00:00-05:00</updated><id>http://localhost:4000/thm-cmess-writeup</id><content type="html" xml:base="http://localhost:4000/thm-cmess-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Heyo, today we’re doing Cmess from tryhackme, a medium-rated box that involved finding a local file inclusion, looking at a configuration file to find a subdomain, getting a password for a user that we can log into an admin panel with. For remote code execution we’re abusing an upload form and we modify a .htaccess file. On the box there’s a backup password hidden in /opt that gets us a low-priv user shell on the box. For privilege escalation we’re abusing a cronjob tar wildcard within a folder where we have write permission.&lt;/p&gt;
+
+&lt;h2 id=&quot;nmap&quot;&gt;Nmap&lt;/h2&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Nmap 7.91 scan initiated Wed Sep 22 10:46:04 2021 as: nmap -sC -sV -oN nmap/cmess -p- 10.10.211.176&lt;/span&gt;
+Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;10.10.211.176
+Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.027s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Not shown: 65533 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; protocol 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ssh-hostkey: 
+|   2048 d9:b6:52:d3:93:9a:38:50:b4:23:3b:fd:21:0c:05:1f &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;RSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   256 21:c3:6e:31:8b:85:22:8a:6d:72:86:8f:ae:64:66:2b &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ECDSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_  256 5b:b9:75:78:05:d7:ec:43:30:96:17:ff:c6:a8:6c:ed &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ED25519&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+80/tcp open  http    Apache httpd 2.4.18 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+|_http-generator: Gila CMS
+| http-robots.txt: 3 disallowed entries 
+|_/src/ /themes/ /lib/
+|_http-server-header: Apache/2.4.18 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_http-title: Site doesn&lt;span class=&quot;s1&quot;&gt;'t have a title (text/html; charset=UTF-8).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Sep 22 10:46:31 2021 -- 1 IP address (1 host up) scanned in 27.76 seconds
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Before going to the webserver, there’s one thing we’re required to do.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h2 id=&quot;webserver&quot;&gt;WebServer&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing appears out of the order at the first sight, but we do have a copyright that’s from 2017, as well as the name of the possible CMS that the website is running on “Gila CMS”. First things first, searchsploit it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;4 results. Because the copyright on the website says 2017, I’ll go with the last one “Gila CMS &amp;lt; 1.11.1 - Local File Inclusion”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Authenticated, since we haven’t got any type of access we’re not going to dig into it. I went googling in hope that I’ll find something, and I did.&lt;/p&gt;
+
+&lt;p&gt;Post: https://infosecdb.wordpress.com/2020/01/05/gilacms-1-11-8-cm-deletet-lfi-local-file-inclusion-and-rce/&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It says “Authentication: Required” , but let’s go for it anyway.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hmm, let’s try the base root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey look at that, local file inclusion. Now what can we do with it? I’ve tried php filters, and quite some ways to obtain remote code execution off of it. Nothing, but a thing I always check when i see a local file inclusion on a webserver that runs apache is “/etc/apache2/sites-available/000-default.conf”, if there’s any virutal host in place, this file will give us quite valuable information, let’s try that.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looks like we’ve got something, dev.cmess.thm. Let’s add that to our hosts file and see what’s there.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve tried logging into the box via ssh with it but it didn’t work. So let’s try it on the admin panel.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And we get in. We can also see the version of Gila that’s running on. Now our main goal here is to obtain rce. After 2 minutes of googling I’ve stumbled across a post on github.&lt;/p&gt;
+
+&lt;p&gt;Post: https://github.com/jkana/Gila-CMS-1.16.0-shell-upload&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Instead of going 1:1 with that post, I’ll do it my way.&lt;/p&gt;
+
+&lt;p&gt;First, one directory up.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Then we create a file called whateveryouwant.php (you can literally call it however you want, just make sure it has .php at the end)&lt;/p&gt;
+
+&lt;p&gt;In it we put a reverse shell.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/17.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve already updated the ip and port. After the file has been created, we’re going to overwrite the .htaccess by making a new .htaccess&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/18.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/19.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, the second after we press “Ok” it’ll say Not Found.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/20.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, just go to the base root and type your shell’s name. Let’s start a listener first.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/21.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now let’s activate the shell by going to the base root + filename.php&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/22.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I got the shell and I’ve stabilized it. After just 20 seconds of poking around I’ve found a hidden file called .password.bak in /opt directory&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/23.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;user&quot;&gt;User&lt;/h2&gt;
+
+&lt;p&gt;Let’s try to log in via ssh.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/24.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After checking some basic things I checked /etc/crontab&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/25.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For me, this looks like an easy privesc, since we have write permission in our own home folder, we can abuse the wildcard (*) to get a reverse shell as root on the box, let’s see that in action. :)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/26.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we’re waiting for the connection to be made :D&lt;/p&gt;
+
+&lt;h2 id=&quot;rooted&quot;&gt;Rooted&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/cmess/27.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That was it, a fun medium-rated box from tryhackme, hope you enjoyed, thanks for reading.&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="tar" /><category term="gila cms" /><category term="enumeration" /><category term="lfi" /><category term="security" /><category term="pentesting" /><category term="CVE-2020-5513" /><summary type="html">Can you root this Gila CMS box?</summary></entry><entry><title type="html">0day - Try Hack Me</title><link href="http://localhost:4000/thm-0day-writeup/" rel="alternate" type="text/html" title="0day - Try Hack Me" /><published>2022-01-03T00:00:00-05:00</published><updated>2022-01-03T00:00:00-05:00</updated><id>http://localhost:4000/thm-0day-writeup</id><content type="html" xml:base="http://localhost:4000/thm-0day-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hello, and welcome to the write-up for 0day machine on TryHackMe, a medium-rated machine that involved exploiting a shellshock vulnerability, then escalating to root via a kernel exploit.&lt;/p&gt;
 
@@ -132,7 +267,7 @@ http://10.10.115.124/cgi-bin/test.cgi
 
 &lt;p&gt;&lt;img src=&quot;/assets/images/thm/0day/24.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Well, simple as that we rooted this box. It was definitely not a tough machine, and you can learn that even tools like nikto can get you where you want to be. Hope you enjoyed reading this write-up.&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="shellshock" /><category term="kernel exploit" /><category term="tryhackme" /><category term="security" /><category term="pentesting" /><category term="CVE-2014-6271" /><summary type="html">0day invloves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit.</summary></entry><entry><title type="html">Vulnversity - Try Hack Me</title><link href="http://localhost:4000/thm-vulnversity-writeup/" rel="alternate" type="text/html" title="Vulnversity - Try Hack Me" /><published>2021-05-22T00:00:00-04:00</published><updated>2021-05-22T00:00:00-04:00</updated><id>http://localhost:4000/thm-vulnversity-writeup</id><content type="html" xml:base="http://localhost:4000/thm-vulnversity-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Well, simple as that we rooted this box. It was definitely not a tough machine, and you can learn that even tools like nikto can get you where you want to be. Hope you enjoyed reading this write-up.&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="overlayfs" /><category term="shellshock" /><category term="kernel exploit" /><category term="tryhackme" /><category term="security" /><category term="pentesting" /><category term="CVE-2014-6271" /><summary type="html">0day invloves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit.</summary></entry><entry><title type="html">Vulnversity - Try Hack Me</title><link href="http://localhost:4000/thm-vulnversity-writeup/" rel="alternate" type="text/html" title="Vulnversity - Try Hack Me" /><published>2022-01-03T00:00:00-05:00</published><updated>2022-01-03T00:00:00-05:00</updated><id>http://localhost:4000/thm-vulnversity-writeup</id><content type="html" xml:base="http://localhost:4000/thm-vulnversity-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/vulnversity/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hello, today we’re doing Vulnversity from tryhackme.com , an easy machine aimed for beginners. It involved finding an upload form, then exploiting that poorly secured upload form to obtain a shell on the box. For privilege escalation we found out that there is a suid bit set on systemctl , checking gtfobins gives us a method on how to run commands as root.&lt;/p&gt;
 
