@@ -13,4 +13,9 @@ var store = [{
         "excerpt":"Heyo, today we’re doing Cmess from tryhackme, a medium-rated box that involved finding a local file inclusion, looking at a configuration file to find a subdomain, getting a password for a user that we can log into an admin panel with. For remote code execution we’re abusing an upload form...","categories": ["tryhackme","infosec"],
         "tags": ["tar","gila cms","enumeration","lfi","security","pentesting","CVE-2020-5513"],
         "url": "http://localhost:4000/thm-cmess-writeup/",
-        "teaser":"http://localhost:4000/assets/images/thm/cmess/thumbnail.png"}]
+        "teaser":"http://localhost:4000/assets/images/thm/cmess/thumbnail.png"},{
+        "title": "eCPPTv2 exam review",
+        "excerpt":"Heyo, I know I might be a bit late on this, since I’ve taken eCPPT on 2021’s December 1st, but I’ll make this review nonetheless. What is eCPPT? eCPPT stands for eLearnSecurity Certified Professional Penetration Tester, it is a completely hands on exam in which you are required to exploit...","categories": ["infosec"],
+        "tags": ["INE","elearnsecurity","pentesting","review","exam","ecppt"],
+        "url": "http://localhost:4000/ecppt-review/",
+        "teaser":"http://localhost:4000/assets/images/reviews/ecppt/thumbnail.png"}]
