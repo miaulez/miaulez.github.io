@@ -18,4 +18,9 @@ var store = [{
         "excerpt":"Heyo, I know I might be a bit late on this, since I’ve taken eCPPT on 2021’s December 1st, but I’ll make this review nonetheless. What is eCPPT? eCPPT stands for eLearnSecurity Certified Professional Penetration Tester, it is a completely hands on exam in which you are required to exploit...","categories": ["infosec"],
         "tags": ["INE","elearnsecurity","pentesting","review","exam","ecppt"],
         "url": "http://localhost:4000/ecppt-review/",
-        "teaser":"http://localhost:4000/assets/images/reviews/ecppt/thumbnail.png"}]
+        "teaser":"http://localhost:4000/assets/images/reviews/ecppt/thumbnail.png"},{
+        "title": "Debug - Try Hack Me",
+        "excerpt":"Hey there, welcome to the write-up for Debug, a TryHackMe box made by ustoun0 which invloves finding a backup directory which has an index.php.bak inside. Doing some code review we can quickly see that the code is vulnerable to php deserialization and we can write a shell on the webserver....","categories": ["tryhackme","infosec"],
+        "tags": ["php deserialization","apache hash","ssh banner","privesc","security","pentesting"],
+        "url": "http://localhost:4000/thm-debug-writeup/",
+        "teaser":"http://localhost:4000/assets/images/thm/debug/thumbnail.png"}]
