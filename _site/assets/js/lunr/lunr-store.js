@@ -23,4 +23,9 @@ var store = [{
         "excerpt":"Hey there, welcome to the write-up for Debug, a TryHackMe box made by ustoun0 which invloves finding a backup directory which has an index.php.bak inside. Doing some code review we can quickly see that the code is vulnerable to php deserialization and we can write a shell on the webserver....","categories": ["tryhackme","infosec"],
         "tags": ["php deserialization","apache hash","ssh banner","privesc","security","pentesting"],
         "url": "http://localhost:4000/thm-debug-writeup/",
-        "teaser":"http://localhost:4000/assets/images/thm/debug/thumbnail.png"}]
+        "teaser":"http://localhost:4000/assets/images/thm/debug/thumbnail.png"},{
+        "title": "eWPT exam review",
+        "excerpt":"Hey there, since I’ve taken eWPT a while ago I decided that I should make a review about it, so here we go. What is eWPT? eWPT stands for eLearnSecurity Web application Penetration Tester, it is a completely hands on exam in which you are required to assess a company’s...","categories": ["infosec"],
+        "tags": ["INE","elearnsecurity","pentesting","review","exam","ewpt"],
+        "url": "http://localhost:4000/ewpt-review/",
+        "teaser":"http://localhost:4000/assets/images/reviews/ewpt/thumbnail.png"}]
