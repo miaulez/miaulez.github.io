@@ -103,8 +103,8 @@ analytics:
 author:
   name             : "Miaulez"
   avatar           : "/assets/images/avatar.jpg"
-  bio              : "Penetration Tester<br>eCPPT | eWPT | eJPT"
-  location         : "Romania"
+  bio              : "Penetration Tester / CTF Player<br>eCPPT | eWPT | eJPT"
+  #location         : "Romania"
   email            : "root@miaulez.rocks"
   uri              :
   home             : # null (default), "absolute or relative url to link to author home"
