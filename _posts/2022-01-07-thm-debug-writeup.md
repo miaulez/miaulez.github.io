@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Debug - Try Hack Me
-excerpt: "Debug invloves exploiting a php deserialization vulnerability for an initial foothold, escalating to james by cracking an apache password. For root we modify the ssh welcome banner."
+excerpt: "Debug involves exploiting a php deserialization vulnerability for an initial foothold, escalating to james by cracking an apache password. For root we modify the ssh welcome banner."
 date: 2022-01-07
 classes: wide
 header:
@@ -201,7 +201,7 @@ First things first, let's stabilize our shell.
 
 In the same directory we've landed our webshell, there is a hidden file called .htpasswd. In it we've got what it looks like a hash and a username called "james" which is a user on the box.
 
-![]/assets/images/thm/debug/10-1.png)
+![](/assets/images/thm/debug/10-1.png)
 
 Let's try cracking that hash with hashcat. First, let's find out what mode is needed to crack that specific hash. For that, I'm gonna go to example_hashes from hashcat's website and search for apr1.
 
