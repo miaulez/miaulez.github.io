@@ -22,7 +22,7 @@ tags:
 
 ![](/assets/images/thm/debug/1.png)
 
-Hey there, welcome to the write-up for Debug, a TryHackMe box made by ustoun0 which invloves finding a backup directory which has an index.php.bak inside. Doing some code review we can quickly see that the code is vulnerable to php deserialization and we can write a shell on the webserver. Once on the box, we find a .htpasswd file which has James's hash in it, we crack it using hashcat and then we log in via ssh as James. For root we modify 00-header, we relog via ssh and get a shell as root on the box.
+Hey there, welcome to the write-up for Debug, a TryHackMe box made by ustoun0 which involves finding a backup directory which has an index.php.bak inside. Doing some code review we can quickly see that the code is vulnerable to php deserialization attack and we can write a shell on the webserver. Once on the box, we find a .htpasswd file which has James's hash in it, we crack it using hashcat and then we log in via ssh as James. For root we modify 00-header, we relog via ssh and get a shell as root on the box.
 
 ## Nmap
 
