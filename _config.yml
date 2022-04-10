@@ -16,11 +16,11 @@ minimal_mistakes_skin    : "haxor" # "air", "aqua", "contrast", "dark", "dirt", 
 
 # Site Settings
 locale                   : "en-US"
-title                    : "miaulez.rocks"
+title                    : "miaulez.io"
 title_separator          : "-"
 name                     : "Miaulez"
-description              : "Ethical Hacking, Penetration Testing, Security, CTFs and more."
-url                      : "https://miaulez.rocks" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+description              : "Cyber Security, Ethical Hacking, Penetration Testing, Security, CTFs and more."
+url                      : "https://miaulez.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "miaulez/miaulez.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 logo                     : "/assets/images/masthead.gif"
@@ -118,7 +118,7 @@ author:
   gitlab           :
   google_plus      :
   keybase          :
-  instagram        : "miaulez_sec"
+  #instagram        : "miaulez_sec"
   lastfm           :
   linkedin         : "lacatus-lucian-7a6a17221"
   pinterest        :
