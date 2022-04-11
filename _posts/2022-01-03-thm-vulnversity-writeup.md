@@ -79,7 +79,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 # FTP
 
-If anonymous login was enabled, nmap would tell us that, but nmap is weird sometimes and doesn’t and I always like to check it manually anyway.
+If anonymous login was enabled, nmap would have pointed that out, but tools may fail from time to time and I always like checking manually anyway.
 
 ![](/assets/images/thm/vulnversity/2.png)
 
@@ -129,7 +129,7 @@ Trying to upload a php reverse shell from pentestmonkey
 
 ![](/assets/images/thm/vulnversity/12.png)
 
-And we get “Extension not allowed” , but what if it doesn’t check for other extensions other than .php? What if we try uploading a .phtml for example? Will that do the thing?
+And we get “Extension not allowed” , but what if it doesn’t check for other extensions and just checks for .php? What if we try uploading a .phtml for example? Will that do the thing?
 
 ![](/assets/images/thm/vulnversity/13.png)
 
@@ -210,4 +210,4 @@ Let’s try this
 
 ![](/assets/images/thm/vulnversity/27.png)
 
-Well, that was it, an easy box, aimed for beginners. All I do when I write these write-ups is that I want to show you guys the methodology (if beginners are reading this), my thought process and all that stuff. Hope you've learned something new and I’ll see you next time
+Well, that was it, an easy box, aimed for beginners. All I do when I write these write-ups is that I want to show you guys the methodology (if beginners are reading this), my thought process and all that stuff. Hope you've learned something new :)
