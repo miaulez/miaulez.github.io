@@ -59,7 +59,7 @@ Before going to the webserver, there's one thing we're required to do.
 
 ![](/assets/images/thm/cmess/4.png)
 
-Nothing appears out of the order at the first sight, but we do have a copyright that's from 2017, as well as the name of the possible CMS that the website is running on "Gila CMS". First things first, searchsploit it.
+Nothing appears out of the ordinary at the first glance, but we do have a copyright that's from 2017, as well as the name of the possible CMS that the website is running on "Gila CMS". First things first, searchsploit it.
 
 ![](/assets/images/thm/cmess/5.png)
 
@@ -81,7 +81,7 @@ Hmm, let’s try the base root.
 
 ![](/assets/images/thm/cmess/9.png)
 
-Hey look at that, local file inclusion. Now what can we do with it? I've tried php filters, and quite some ways to obtain remote code execution off of it. Nothing, but a thing I always check when i see a local file inclusion on a webserver that runs apache is “/etc/apache2/sites-available/000-default.conf”, if there’s any virutal host in place, this file will give us quite valuable information, let’s try that.
+Hey look at that, local file inclusion. Now what can we do with it? I've tried php filters, and few some ways to obtain remote code execution off of it. Nothing, but a thing I always check for when I see a local file inclusion on a webserver that runs apache is “/etc/apache2/sites-available/000-default.conf”, if there’s any virutal host in place, this file will give us some valuable information, let’s try that.
 
 ![](/assets/images/thm/cmess/10.png)
 
@@ -91,7 +91,7 @@ Looks like we’ve got something, dev.cmess.thm. Let's add that to our hosts fil
 
 ![](/assets/images/thm/cmess/12.png)
 
-I’ve tried logging into the box via ssh with it but it didn’t work. So let’s try it on the admin panel.
+I’ve tried logging into the box via ssh with the password found, but it didn’t work. So let’s try it on the admin panel.
 
 ![](/assets/images/thm/cmess/13.png)
 
@@ -147,7 +147,7 @@ After checking some basic things I checked /etc/crontab
 
 ![](/assets/images/thm/cmess/25.png)
 
-For me, this looks like an easy privesc, since we have write permission in our own home folder, we can abuse the wildcard (*) to get a reverse shell as root on the box, let’s see that in action. :)
+For me, this looks like an easy privesc, since we have write permissions in our own home folder, we can abuse the wildcard (*) to get a reverse shell as root on the box, let’s see that in action. :)
 
 ![](/assets/images/thm/cmess/26.png)
 
