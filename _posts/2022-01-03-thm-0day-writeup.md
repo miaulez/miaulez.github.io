@@ -1,7 +1,7 @@
 ---
 layout: single
 title: 0day - Try Hack Me
-excerpt: "0day invloves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit."
+excerpt: "0day involves exploiting a shellshock vulnerability for an initial foothold, then escalating to root via a kernel exploit."
 date: 2022-01-03
 classes: wide
 header:
@@ -49,7 +49,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 # Nmap done at Mon Sep 13 06:24:42 2021 -- 1 IP address (1 host up) scanned in 15.35 seconds
 ```
 
-Nothing that stands up, just that the openssh is a bit outdated, but it does not have any public exploits available to aid us into gaining access to the machine
+Nothing that stands up, just that the openssh is a bit outdated, but it does not have any public exploits available so we'll move on.
 
 # WebServer
 
@@ -63,7 +63,7 @@ Nothing as well, let’s dive into directory busting.
 
 ![](/assets/images/thm/0day/4.png)
 
-Gobuster quickly found some interesting directories to have look into, let’s check each one of these
+Gobuster quickly found some interesting directories to have a look into, let’s check each one of these
 
 going to /uploads we discover a blank page (but we might gobuster it)
 
@@ -109,7 +109,7 @@ Googling “shellshock exploit”, quickly gives us a github page, that explains
 
 ![](/assets/images/thm/0day/14.png)
 
-However, having done our enumeration thoroughly and having nikto run in the background while checking the directories and all that stuff, nikto will actually tell us that there is a shellshock vulnerability on the website, let’s take a look
+However, having done our enumeration thoroughly and having nikto run in the background while checking the directories and all that stuff, nikto would've had actually tell us that there is a shellshock vulnerability on the website, let’s take a look
 
 ![](/assets/images/thm/0day/15.png)
 
