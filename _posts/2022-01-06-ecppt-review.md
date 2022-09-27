@@ -1,7 +1,7 @@
 ---
 layout: single
 title: eCPPTv2 exam review
-excerpt: "A review of the eLearnSecurity's eCPPT exam and certification."
+excerpt: "Review of eLearnSecurity's eCPPT exam and certification."
 date: 2022-01-06
 classes: wide
 header:
