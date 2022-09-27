@@ -1,7 +1,7 @@
 ---
 layout: single
 title: eWPT exam review
-excerpt: "A review of the eLearnSecurity's eWPT exam and certification."
+excerpt: "Review of eLearnSecurity's eWPT exam and certification."
 date: 2022-01-26
 classes: wide
 header:
