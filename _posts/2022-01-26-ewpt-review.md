@@ -69,7 +69,7 @@ Other than that, these are some resources that you might want to take a look at 
 
 ## Exam day
 
-The exam started out like the eCPPT's one, Letter of Engagement, basic recon etc.. You'll quickly start to find vulnerabilities here and there, but don't think that's all. There are some "obscure" vulnerabilities that you can miss them if you don't pay enough attention.
+The exam started out like the eCPPT's one, Letter of Engagement, basic recon etc.. You'll quickly start to find vulnerabilities here and there, but don't think that's all. There are some "obscure" vulnerabilities that you can miss if you don't pay enough attention.
 
 The exam covers what you've learned during the course material. Having done all the labs while supposedly you took good notes along the way, the exam shouldn't difficult at all. Of course it may throw you off in some circumstances but that's up to you and how you can think in critical moments. (From eCPPT review)
 
